@@ -1,53 +1,70 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 )
 
 func main() {
 	var (
-		amountRecords   int
-		lengInputString int
-		inputString     string
+		amountRecords         int
+		lengInputString       int
+		previousElem          int
+		rowSing               string
+		inputString           string
+		lineNotHaveZeroNumber bool
+		flag                  bool
 	)
-	fmt.Scan(&amountRecords)
+	fmt.Scanln(&amountRecords)
 	for i := 0; i < amountRecords; i++ {
-		fmt.Scan(&lengInputString)
-		fmt.Scanln(&inputString)
+		fmt.Scanln(&lengInputString)
+		scanner := bufio.NewScanner(os.Stdin)
+		scanner.Scan()
+		inputString = scanner.Text()
 		inputRawData := strings.Split(inputString, " ")
 		inputData := ConvertSliceToInt(inputRawData)
 
-		for inner := 0; inner < lengInputString; {
-			step := FindRow(inputData)
+		firstElem := inputData[0]
+		previousElem = inputData[0]
+		lineNotHaveZeroNumber = true
+		line := []int{}
+		for inner := 1; inner < lengInputString; inner++ {
+			if lineNotHaveZeroNumber == true {
+				if inputData[inner] == 0 {
+					flag = true
+				}
+			} else {
+				if inputData[inner] == 0 {
+					rowSing = FindRowSing(line)
+					fmt.Print(strconv.Itoa(firstElem) + " " + rowSing + strconv.Itoa(len(line)) + " ")
+					firstElem = inputData[inner]
+					line = nil
+					lineNotHaveZeroNumber = true
+					flag = false
+				}
+
+			}
+
+			if previousElem-inputData[inner] == 1 || previousElem-inputData[inner] == -1 {
+				line = append(line, inputData[inner])
+				if flag {
+					lineNotHaveZeroNumber = false
+				}
+			} else {
+				rowSing = FindRowSing(line)
+				fmt.Print(strconv.Itoa(firstElem) + " " + rowSing + strconv.Itoa(len(line)) + " ")
+				firstElem = inputData[inner]
+				line = nil
+				lineNotHaveZeroNumber = true
+				flag = false
+			}
+
+			previousElem = inputData[inner]
 		}
 	}
-}
-
-func FindRow(input []int) int {
-	baseElement := input[0]
-	var (
-		summa int
-		multi int
-	)
-
-	for i := 1; i < len(input); i++ {
-		nextNumber := input[i]
-		switch baseElement - nextNumber {
-		case 1:
-			summa++
-			multi = 1
-		case -1:
-			summa++
-			multi = -1
-		default:
-			summa = 0
-			multi = 0
-		}
-		baseElement = nextNumber
-	}
-	return 1
 }
 
 func ConvertSliceToInt(input []string) []int {
@@ -58,4 +75,18 @@ func ConvertSliceToInt(input []string) []int {
 		intSlice = append(intSlice, elem)
 	}
 	return intSlice
+}
+
+func FindRowSing(line []int) string {
+	var result string
+	if len(line) == 1 {
+		result = ""
+	} else {
+		if line[0] > line[1] {
+			result = "-"
+		} else {
+			result = "+"
+		}
+	}
+	return result
 }
