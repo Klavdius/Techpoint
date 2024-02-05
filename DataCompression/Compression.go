@@ -1,160 +1,94 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"strconv"
-	"strings"
+)
+
+var finalResult = []int{}
+var (
+	sum       = 0
+	sumNeg    = 0
+	firstElem int
+	elem      int
+	nextElem  int
 )
 
 func main() {
-	var (
-		amountRecords   int
-		lengInputString int
-		inputString     string
-	)
+	var amountRecord int
 
-	finalLine := []int{}
+	fmt.Scan(&amountRecord)
+	for i := 0; i < amountRecord; i++ {
+		var lengthInputString int
+		fmt.Scan(&lengthInputString)
+		for inner := 0; inner < lengthInputString; inner++ {
+			fmt.Scan(&nextElem)
+			if inner != 0 {
+				if elem-nextElem == 1 || elem-nextElem == -1 {
+					if elem-nextElem == 1 {
+						if sum == 0 {
+							sumNeg--
+						} else {
+							AddNumberInResult(firstElem, sum)
+							NewRow()
+						}
+						elem = nextElem
+					} else {
+						if sumNeg == 0 {
+							sum++
+						} else {
+							AddNumberInResult(firstElem, sumNeg)
+							NewRow()
+						}
+						elem = nextElem
+					}
+				} else {
+					ChekingNeedAddNumberInRow()
+					NewRow()
+				}
 
-	fmt.Scanln(&amountRecords)
-	for i := 0; i < amountRecords; i++ {
-		fmt.Scanln(&lengInputString)
-		scanner := bufio.NewScanner(os.Stdin)
-		scanner.Scan()
-		inputString = scanner.Text()
-		inputRawData := strings.Split(inputString, " ")
-		inputData := ConvertSliceToInt(inputRawData)
-
-		for inner := 0; inner < lengInputString; inner++ {
-
-			lengTestLine := FindLengRowInInput(inputData)
-
-			testOnZero, positionZero := TestOnDoubleZeroInLine(inputData[:lengTestLine])
-
-			for testOnZero > 1 {
-				lengTestLine = CuteDoubleZeroInLine(inputData[:positionZero+1])
-				testOnZero, positionZero = TestOnDoubleZeroInLine(inputData[:lengTestLine])
-			}
-
-			test2 := testOnOneRowSing(inputData[:lengTestLine])
-
-			for !test2 {
-				lengTestLine--
-				test2 = testOnOneRowSing(inputData[:lengTestLine])
-			}
-			line := inputData[:lengTestLine]
-			sing := FindRowSing(line)
-
-			number := 0
-			switch sing {
-			case "":
-				number = 0
-			case "-":
-				number = (len(line) - 1) * -1
-			case "+":
-				number = (len(line) - 1)
-			}
-			finalLine = append(finalLine, line[0])
-			finalLine = append(finalLine, number)
-			inputData = inputData[len(line):]
-
-			if len(inputData) == 0 {
-				break
-			}
-		}
-		fmt.Println(len(finalLine))
-
-		for _, v := range finalLine {
-			fmt.Print(strconv.Itoa(v) + " ")
-		}
-		fmt.Println()
-		finalLine = nil
-	}
-}
-
-func ConvertSliceToInt(input []string) []int {
-	var intSlice = []int{}
-	lengSlice := len(input)
-	for i := 0; i < lengSlice; i++ {
-		elem, _ := strconv.Atoi(input[i])
-		intSlice = append(intSlice, elem)
-	}
-	return intSlice
-}
-
-func FindLengRowInInput(line []int) int {
-	firstElem := line[0]
-	nextElem := firstElem
-	sum := 1
-	for i, v := range line {
-		if i != 0 {
-			if nextElem-v == 1 || nextElem-v == -1 {
-				sum++
-				nextElem = v
 			} else {
-				break
+				NewRow()
+			}
+
+			if inner == lengthInputString-1 {
+				ChekingNeedAddNumberInRow()
+				NewRow()
 			}
 		}
+		PrintResult()
 	}
-
-	return sum
 }
 
-func TestOnDoubleZeroInLine(line []int) (int, int) {
-	result := 0
-	positionZero := 0
-	for i, v := range line {
-		if v == 0 {
-			result++
-			positionZero = i
-		}
+func AddNumberInResult(firstNum int, sum int) {
+	finalResult = append(finalResult, firstNum)
+	finalResult = append(finalResult, sum)
+}
+
+func PrintResult() {
+	fmt.Println(len(finalResult))
+	for _, v := range finalResult {
+		fmt.Print(strconv.Itoa(v) + " ")
 	}
-
-	return result, positionZero
+	fmt.Println()
+	finalResult = nil
+	sum = 0
+	sumNeg = 0
 }
 
-func CuteDoubleZeroInLine(line []int) int {
-	line = line[:len(line)-1]
-	return len(line)
-}
-
-func testOnOneRowSing(line []int) bool {
-	result := true
-	if len(line) != 1 {
-		sing := line[0] - line[1]
-		if sing > 0 {
-			for i, v := range line {
-				if i != 0 {
-					if v >= line[0] {
-						result = false
-					}
-				}
-			}
-		} else {
-			for i, v := range line {
-				if i != 0 {
-					if v <= line[0] {
-						result = false
-					}
-				}
-			}
-		}
-	}
-
-	return result
-}
-
-func FindRowSing(line []int) string {
-	var result string
-	if len(line) == 1 {
-		result = ""
+func ChekingNeedAddNumberInRow() {
+	if sum == 0 && sumNeg == 0 {
+		AddNumberInResult(firstElem, 0)
+	} else if sum == 0 {
+		AddNumberInResult(firstElem, sumNeg)
 	} else {
-		if line[0] > line[1] {
-			result = "-"
-		} else {
-			result = "+"
-		}
+		AddNumberInResult(firstElem, sum)
 	}
-	return result
+}
+
+func NewRow() {
+	firstElem = nextElem
+	elem = nextElem
+	sum = 0
+	sumNeg = 0
 }
