@@ -11,21 +11,21 @@ import (
 )
 
 func main() {
-	var amountDoc int
-	fmt.Scan(&amountDoc)
+
+	var in *bufio.Reader
+	var out *bufio.Writer
+	in = bufio.NewReader(os.Stdin)
+	out = bufio.NewWriter(os.Stdout)
+	defer out.Flush()
+
+	var (
+		amountDoc int
+		needPage  int
+		inputData string
+	)
+	fmt.Fscan(in, &amountDoc)
 	for i := 0; i < amountDoc; i++ {
-
-		var in *bufio.Reader
-		var out *bufio.Writer
-		in = bufio.NewReader(os.Stdin)
-		out = bufio.NewWriter(os.Stdout)
-
-		var (
-			needPage  int
-			inputData string
-		)
 		fmt.Fscan(in, &needPage, &inputData)
-
 		needPrintPage := []int{}
 		inputPage := []string{}
 		for i := 1; i <= needPage; i++ {
@@ -43,7 +43,6 @@ func main() {
 		outputPage := GiveFormatRowPage(needPrintPage)
 		finalString := strings.Join(outputPage, ",")
 		fmt.Fprintln(out, finalString)
-		out.Flush()
 	}
 }
 
@@ -85,7 +84,7 @@ func GiveFormatRowPage(input []int) []string {
 				} else {
 					number := strconv.Itoa(v)
 					result = append(result, number)
-					first = v
+					first = input[i+1]
 				}
 			}
 		} else {
