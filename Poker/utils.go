@@ -2,7 +2,6 @@ package main
 
 import (
 	"strconv"
-	"strings"
 )
 
 var outMask = map[string]int{
@@ -22,23 +21,13 @@ var highTir = map[int]string{
 
 var suits = []string{"D", "S", "C", "H"}
 
-func outMaskCard(hand string) int {
-	cards := strings.Split(hand, " ")
-	firstCard, err := strconv.Atoi(cards[0])
+func IntNumberCard(line string) int {
+	var number int
+	number, err := strconv.Atoi(line)
 	if err != nil {
-		firstCard = outMask[cards[0][:1]]
+		number = outMask[line]
 	}
-	secondCard, err := strconv.Atoi(cards[1])
-	if err != nil {
-		secondCard = outMask[cards[1][:1]]
-	}
-	var topCard int
-	if firstCard > secondCard {
-		topCard = firstCard
-	} else {
-		topCard = secondCard
-	}
-	return topCard
+	return number
 }
 
 func TakeCard(number int, suit string) string {

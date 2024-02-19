@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 )
 
 func main() {
@@ -23,7 +24,6 @@ func main() {
 		var (
 			playersList = []Player{}
 			CardsInGame = map[string]string{}
-			winCards    = []string{}
 		)
 		CardsInGame = BuildNewDeck()
 		fmt.Fscan(in, &players)
@@ -43,19 +43,22 @@ func main() {
 			delete(CardsInGame, dropSecondCard)
 		}
 
-		for _, v := range playersList[0].cardsNeededToWin {
-			_, ok := CardsInGame[v]
-			if ok {
-				winCards = append(winCards, v)
+		if !playersList[0].havePocketPair {
+			for _, v := range playersList {
+				if v.havePocketPair == true {
+					playersList[0].Comparison(v)
+				}
 			}
-		}
-		if len(winCards) != 0 {
-			for _, v := range winCards {
-				fmt.Println(v)
+
+			if len(playersList[0].cardsNeededToWin) == 0 {
+				fmt.Println(0)
+			} else {
+				PrintWin(playersList[0].cardsNeededToWin)
 			}
 		} else {
-			fmt.Println("-")
+			PrintWin(playersList[0].cardsNeededToWin)
 		}
+
 	}
 
 }
@@ -69,4 +72,11 @@ func MakePlayer(c Catcher) Player {
 	p.LookForPair()
 	p.FoundWinCard()
 	return p
+}
+
+func PrintWin(line []string) {
+	sort.Strings(line)
+	for _, v := range line {
+		fmt.Println(v)
+	}
 }

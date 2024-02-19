@@ -1,6 +1,8 @@
 package main
 
-import "strconv"
+import (
+	"strconv"
+)
 
 type Player struct {
 	number           int
@@ -49,6 +51,23 @@ func (p *Player) FoundWinCard() {
 			} else {
 				p.cardsNeededToWin = append(p.cardsNeededToWin, p.firstCard[:1]+v)
 			}
+		}
+	}
+}
+
+func (p *Player) Comparison(rival Player) {
+	if IntNumberCard(rival.firstCard[:1]) > IntNumberCard(p.firstCard[:1]) {
+		var cut = []string{}
+		p.cardsNeededToWin = cut
+	} else {
+		if IntNumberCard(rival.firstCard[:1]) > IntNumberCard(p.secondCard[:1]) {
+			var cut = []string{}
+			for _, v := range p.cardsNeededToWin {
+				if v[:1] != p.secondCard[:1] {
+					cut = append(cut, v)
+				}
+			}
+			p.cardsNeededToWin = cut
 		}
 	}
 }
