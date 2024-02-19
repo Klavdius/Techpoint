@@ -20,7 +20,7 @@ var highTir = map[int]string{
 	14: "A",
 }
 
-var fats = []string{"D", "S", "C", "H"}
+var suits = []string{"D", "S", "C", "H"}
 
 func outMaskCard(hand string) int {
 	cards := strings.Split(hand, " ")
@@ -41,8 +41,7 @@ func outMaskCard(hand string) int {
 	return topCard
 }
 
-func MaskCard(number int, suit string) string {
-
+func TakeCard(number int, suit string) string {
 	var newCard string
 	if number < 10 {
 		newCard = strconv.Itoa(number) + suit
@@ -52,10 +51,25 @@ func MaskCard(number int, suit string) string {
 	return newCard
 }
 
-func ChekingOnPocketPair(p Player) bool {
+func CheckingOnPocketPair(p Player) bool {
 	result := false
 	if p.havePocketPair {
 		result = true
 	}
 	return result
+}
+
+func BuildNewDeck() map[string]string {
+	var (
+		deck = map[string]string{}
+		card string
+	)
+	for i := 2; i < 15; i++ {
+		for inner := 0; inner < len(suits); inner++ {
+			card = TakeCard(i, suits[inner])
+			deck[card] = card
+		}
+	}
+
+	return deck
 }

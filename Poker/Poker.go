@@ -19,14 +19,15 @@ func main() {
 	)
 
 	fmt.Fscan(in, &amountRecord)
-	var playersList = []Player{}
-	var cardInHands = []string{}
-	var winCards = []string{}
-
 	for i := 0; i < amountRecord; i++ {
+		var (
+			playersList = []Player{}
+			CardsInGame = map[string]string{}
+			winCards    = []string{}
+		)
+		CardsInGame = BuildNewDeck()
 		fmt.Fscan(in, &players)
 		var c Catcher
-
 		var p Player
 		for i := 0; i < players; i++ {
 			_, err := fmt.Fscan(in, &dropFirstCard, &dropSecondCard)
@@ -38,17 +39,25 @@ func main() {
 			c.secondCard = dropSecondCard
 			p = MakePlayer(c)
 			playersList = append(playersList, p)
-			cardInHands = append(cardInHands, dropFirstCard, dropSecondCard)
+			delete(CardsInGame, dropFirstCard)
+			delete(CardsInGame, dropSecondCard)
 		}
 
-		if !ChekingOnPocketPair(playersList[0]) {
-
+		for _, v := range playersList[0].cardsNeededToWin {
+			_, ok := CardsInGame[v]
+			if ok {
+				winCards = append(winCards, v)
+			}
+		}
+		if len(winCards) != 0 {
+			for _, v := range winCards {
+				fmt.Println(v)
+			}
 		} else {
-			NeedWinCards(&winCards, playersList[0])
-			fmt.Println(winCards)
+			fmt.Println("-")
 		}
 	}
-	//fmt.Println(playersList)
+
 }
 
 func MakePlayer(c Catcher) Player {
@@ -58,18 +67,6 @@ func MakePlayer(c Catcher) Player {
 	p.secondCard = c.secondCard
 	p.SortCards()
 	p.LookForPair()
+	p.FoundWinCard()
 	return p
-}
-
-func NeedWinCards(line *[]string, p Player) {
-	numberCards := p.firstCard[:1]
-	var cup = []string{}
-	for _, v := range fats {
-		if v != p.firstCard[1:] {
-			if v != p.secondCard[1:] {
-				cup = append(cup, numberCards+v)
-			}
-		}
-	}
-	line = append(line, cup[0], cup[1])
 }
