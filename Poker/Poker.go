@@ -23,9 +23,9 @@ func main() {
 	for i := 0; i < amountRecord; i++ {
 		var (
 			playersList = []Player{}
-			CardsInGame = map[string]string{}
+			cardsInGame = map[string]string{}
 		)
-		CardsInGame = BuildNewDeck()
+		cardsInGame = BuildNewDeck()
 		fmt.Fscan(in, &players)
 		var c Catcher
 		var p Player
@@ -39,8 +39,8 @@ func main() {
 			c.secondCard = dropSecondCard
 			p = MakePlayer(c)
 			playersList = append(playersList, p)
-			delete(CardsInGame, dropFirstCard)
-			delete(CardsInGame, dropSecondCard)
+			delete(cardsInGame, dropFirstCard)
+			delete(cardsInGame, dropSecondCard)
 		}
 
 		if !playersList[0].havePocketPair {
@@ -49,14 +49,21 @@ func main() {
 					playersList[0].Comparison(v)
 				}
 			}
-
 			if len(playersList[0].cardsNeededToWin) == 0 {
 				fmt.Println(0)
 			} else {
-				PrintWin(playersList[0].cardsNeededToWin)
+				playersList[0].cardsNeededToWin = FindWinCardInDeck(cardsInGame, playersList[0].cardsNeededToWin)
+				if len(playersList[0].cardsNeededToWin) == 0 {
+					TopCardInHand(playersList, cardsInGame)
+				} else {
+					TopCardInHand(playersList, cardsInGame)
+					//PrintWin(playersList[0].cardsNeededToWin)
+				}
+
 			}
 		} else {
-			PrintWin(playersList[0].cardsNeededToWin)
+			WinToPocketPair(playersList, cardsInGame)
+			//PrintWin(playersList[0].cardsNeededToWin)
 		}
 
 	}
@@ -76,7 +83,55 @@ func MakePlayer(c Catcher) Player {
 
 func PrintWin(line []string) {
 	sort.Strings(line)
+	fmt.Println(len(line))
 	for _, v := range line {
+		fmt.Println(v)
+	}
+}
+
+func TopCardInHand(list []Player, deck map[string]string) {
+	for _, v := range list {
+		for _, card := range v.cardsNeededToWin {
+			_, ok := deck[card]
+			if ok {
+				delete(deck, card)
+			}
+		}
+	}
+	fmt.Println(len(deck))
+	var key = []string{}
+	for _, v := range deck {
+		key = append(key, v)
+	}
+	sort.Strings(key)
+	for _, v := range key {
+		fmt.Println(v)
+	}
+}
+
+func WinToPocketPair(list []Player, deck map[string]string) {
+	for _, v := range list {
+		for _, card := range v.cardsNeededToWin {
+			_, ok := deck[card]
+			if ok {
+				if v.havePocketPair {
+					delete(deck, card)
+				} else {
+					if IntNumberCard(card[:1]) > IntNumberCard(list[0].firstCard[:1]) {
+						delete(deck, card)
+					}
+				}
+			}
+		}
+	}
+
+	fmt.Println(len(deck))
+	var key = []string{}
+	for _, v := range deck {
+		key = append(key, v)
+	}
+	sort.Strings(key)
+	for _, v := range key {
 		fmt.Println(v)
 	}
 }

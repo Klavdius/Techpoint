@@ -40,14 +40,6 @@ func TakeCard(number int, suit string) string {
 	return newCard
 }
 
-func CheckingOnPocketPair(p Player) bool {
-	result := false
-	if p.havePocketPair {
-		result = true
-	}
-	return result
-}
-
 func BuildNewDeck() map[string]string {
 	var (
 		deck = map[string]string{}
@@ -61,4 +53,16 @@ func BuildNewDeck() map[string]string {
 	}
 
 	return deck
+}
+
+func FindWinCardInDeck(deck map[string]string, list []string) []string {
+	var winCard = []string{}
+	for _, v := range list {
+		_, ok := deck[v]
+		if ok {
+			winCard = append(winCard, v)
+		}
+	}
+
+	return winCard
 }
